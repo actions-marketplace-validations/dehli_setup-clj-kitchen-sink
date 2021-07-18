@@ -1,0 +1,43 @@
+name: "Setup Clojure Kitchen Sink"
+description: "Sets up a handful of Clojure(Script) dependencies"
+branding:
+  color: blue
+  icon: award
+inputs:
+  github-token:
+    description: "A GitHub PAT that is used to pull dependencies."
+    required: true
+  github-username:
+    description: "The username that the GitHub PAT is associated with."
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: fusion-engineering/setup-git-credentials@v2
+      with:
+        credentials: https://${{ inputs.github-username }}:${{ inputs.github-token }}@github.com/
+
+    # Setup Node.js
+    - uses: actions/setup-node@v2
+      with:
+        node-version: "14"
+    - run: npm set //npm.pkg.github.com/:_authToken ${{ inputs.github-token }}
+
+    # Setup Java
+    - uses: actions/setup-java@v2
+      with:
+        distribution: zulu
+        java-version: 15
+
+    # Setup Clojure
+    - uses: DeLaGuardo/setup-clojure@3.4
+      with:
+        cli: 1.10.3.855
+
+    # Setup Babashka
+    - uses: turtlequeue/setup-babashka@v1.3.0
+      with:
+        babashka-version: 0.4.6
+
+    # Clone the repo
+    - uses: actions/checkout@v2.3.4
